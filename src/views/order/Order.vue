@@ -173,11 +173,8 @@ export default {
   }),
 
 watch: {
-  "$store.state.stateGlobalSelected.fireStationId"(id) {
-    this.$store.dispatch("actionLoadGlobalDataForSelected", null, { root: true });
-    this.$store.dispatch("actionChangeSelectedMonth", {
-      month: this.$store.state.stateGlobalSelected.month
-    }, { root: true });
+  selectedMonth(newMonth) {
+    this.$store.dispatch("actionChangeSelectedMonth", { month: newMonth }, { root: true });
   }
 },
 
@@ -207,12 +204,6 @@ watch: {
       if (diffDays % shiftDiff === 0) shiftCode = "A";
       if (diffDays % shiftDiff === 1) shiftCode = "B";
       if (diffDays % shiftDiff === 2) shiftCode = "C";
-
-      /*if (shiftCode === "A") this.shiftId = 1;
-      if (shiftCode === "B") this.shiftId = 2;
-      if (shiftCode === "C") this.shiftId = 3;
-      if (shiftCode === "D") this.shiftId = 4;
-      */
 
       return shiftCode;
     },
