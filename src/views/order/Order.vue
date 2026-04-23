@@ -171,6 +171,16 @@ export default {
     enableEvents: true,
     pickerDate: new Date().toISOString().substr(0, 10),
   }),
+
+watch: {
+  "$store.state.stateGlobalSelected.fireStationId"(id) {
+    this.$store.dispatch("actionLoadGlobalDataForSelected", null, { root: true });
+    this.$store.dispatch("actionChangeSelectedMonth", {
+      month: this.$store.state.stateGlobalSelected.month
+    }, { root: true });
+  }
+},
+
   methods: {
     nextDate: function () {
       var d = new Date(this.cDate);
