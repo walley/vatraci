@@ -86,31 +86,32 @@ export default {
   },
 
   actions: {
-    async login({ commit, dispatch }, { email, password }) {
-      const response = await Vue.http.post(apiConfig.auth.login, {
-        email,
-        password,
-      });
+async login({ commit, dispatch, state, rootState }, { email, password }) {
+  const response = await Vue.http.post(apiConfig.auth.login, {
+    email,
+    password,
+  });
 
-      const data = response.body;
+  const data = response.body;
 
-      if (!data.token) {
-        throw new Error("No token received from server");
-      }
+  if (!data.token) {
+    throw new Error("No token received from server");
+  }
 
-      // Save token + user
-      commit("SET_AUTH_DATA", data);
+  commit("SET_AUTH_DATA", data);
 
-      // Load all global data AFTER token is stored
-      await dispatch("loadAllGlobalData");
+  // Load base data
+  await dispatch("loadAllGlobalData");
 
-      // 🔥 Load month‑dependent data (planners + vacationActuals)
-      await dispatch("actionChangeSelectedMonth", {
-        month: rootState.stateGlobalSelected.month
-      }, { root: true });
+  // 🔥 Load month‑dependent data (planners + vacationActuals)
+  await dispatch(
+    "actionChangeSelectedMonth",
+    { month: rootState.stateGlobalSelected.month },
+    { root: true }
+  );
 
-      return data;
-    },
+  return data;
+},
 
     restoreAuth({ commit }) {
       commit("RESTORE_AUTH");
