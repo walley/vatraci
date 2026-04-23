@@ -1,9 +1,5 @@
 <template>
-  <div>
-    &nbsp; GlobalData reload
-    <v-btn @click="actionFetchData({ path: 'members' })">Fetch data </v-btn>
-    &nbsp; 
-  </div>
+  <div> &nbsp; app </div>
 </template>
 
 <script>
