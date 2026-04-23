@@ -104,6 +104,11 @@ export default {
       // Load all global data AFTER token is stored
       await dispatch("loadAllGlobalData");
 
+      // 🔥 Load month‑dependent data (planners + vacationActuals)
+      await dispatch("actionChangeSelectedMonth", {
+        month: rootState.stateGlobalSelected.month
+      }, { root: true });
+
       return data;
     },
 
