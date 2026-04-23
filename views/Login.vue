@@ -56,35 +56,32 @@
 </template>
 
 <script>
-
 export default {
-
+  name: "Login",
   data() {
     return {
       email: "",
       password: "",
       loading: false,
       error: null,
-      valid: false,
     };
   },
-
   methods: {
-    async handleLogin() {
+    async onSubmit() {
       this.loading = true;
       this.error = null;
+
       try {
         await this.$store.dispatch("auth/login", {
           email: this.email,
           password: this.password,
         });
-        //Load all data needed for Planner
-        await this.$store.dispatch("auth/loadAllGlobalData");
+
         const redirect = this.$route.query.redirect || "/planner";
         this.$router.push(redirect);
-      } catch (err) {
-        console.error(err);
-        this.error = err.body?.message || err.message || "Neplatný email nebo heslo";
+      } catch (e) {
+        this.error = "Přihlášení se nezdařilo.";
+        console.error(e);
       } finally {
         this.loading = false;
       }
@@ -92,7 +89,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .login-background {
   background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);

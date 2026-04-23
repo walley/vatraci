@@ -11,48 +11,38 @@ import "@/mixins/helperMixin";
 Vue.config.productionTip = false;
 Vue.use(VueLoading);
 
-// -----------------------------------------------------
-// 1. RESTORE AUTH BEFORE APP CREATION
-// -----------------------------------------------------
-store.dispatch("auth/restoreAuth").then(() => {
+// 1) Global vue-resource interceptor (always active)
+Vue.http.interceptors.push((request, next) => {
+  const token = store.state.auth?.token || localStorage.getItem("token");
 
-  // -----------------------------------------------------
-  // 2. SETUP INTERCEPTOR (vue-resource)
-  // -----------------------------------------------------
-  Vue.http.interceptors.push((request, next) => {
-    const token = store.state.auth?.token || localStorage.getItem("token");
+  if (token) {
+    request.headers.set("Authorization", "Bearer " + token);
+    request.headers.set("X-Access-Token", token);
+  }
 
-    if (token) {
-      request.headers.set("Authorization", "Bearer " + token);
-      request.headers.set("X-Access-Token", token);
-    }
+  request.headers.set("X-Client-Version", "v3");
 
-    request.headers.set("X-Client-Version", "v3");
-
-    next((response) => {
-      if (response.status === 401 || response.status === 403) {
-
-        // Prevent infinite loops
-        if (router.currentRoute.path !== "/login") {
-          store.dispatch("auth/logout");
-
-          router.push({
+  next((response) => {
+    if (response.status === 401 || response.status === 403) {
+      if (router.currentRoute.path !== "/login") {
+        store.dispatch("auth/logout");
+        router
+          .push({
             path: "/login",
-            query: { redirect: router.currentRoute.fullPath }
-          }).catch(() => {});
-        }
+            query: { redirect: router.currentRoute.fullPath },
+          })
+          .catch(() => {});
       }
-    });
+    }
   });
+});
 
-  // -----------------------------------------------------
-  // 3. CREATE APP ONLY AFTER AUTH IS RESTORED
-  // -----------------------------------------------------
+// 2) Restore auth, then mount app
+store.dispatch("auth/restoreAuth").then(() => {
   new Vue({
     router,
     store,
     vuetify,
     render: (h) => h(App),
   }).$mount("#app");
-
 });

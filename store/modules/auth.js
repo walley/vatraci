@@ -1,4 +1,3 @@
-// src/store/modules/auth.js
 import Vue from "vue";
 import apiConfig from "@/config/api";
 
@@ -27,10 +26,9 @@ export default {
       state.fireStationIds = data.fireStationIds || [];
       state.isRestored = true;
 
-      // Persist minimal required fields
-      localStorage.setItem("token", state.token);
+      localStorage.setItem("token", state.token || "");
       localStorage.setItem("user", JSON.stringify(state.user));
-      localStorage.setItem("id", state.id);
+      localStorage.setItem("id", state.id || "");
       localStorage.setItem(
         "authData",
         JSON.stringify({
@@ -77,7 +75,6 @@ export default {
       state.fireStationIds = [];
       state.isRestored = false;
 
-      // Only remove auth-related keys
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("id");
@@ -86,32 +83,43 @@ export default {
   },
 
   actions: {
-async login({ commit, dispatch, state, rootState }, { email, password }) {
-  const response = await Vue.http.post(apiConfig.auth.login, {
-    email,
-    password,
-  });
+    async login({ commit, dispatch, state, rootState }, { email, password }) {
+      const response = await Vue.http.post(apiConfig.auth.login, {
+        email,
+        password,
+      });
 
-  const data = response.body;
+      const data = response.body;
 
-  if (!data.token) {
-    throw new Error("No token received from server");
-  }
+      if (!data || !data.token) {
+        throw new Error("No token received from server");
+      }
 
-  commit("SET_AUTH_DATA", data);
+      // Save auth data
+      commit("SET_AUTH_DATA", data);
 
-  // Load base data
-  await dispatch("loadAllGlobalData");
+      // 1) Load base global data (shifts, fireStations, etc.)
+      await dispatch("actionLoadGlobalData", null, { root: true });
 
-  // 🔥 Load month‑dependent data (planners + vacationActuals)
-  await dispatch(
-    "actionChangeSelectedMonth",
-    { month: rootState.stateGlobalSelected.month },
-    { root: true }
-  );
+      // 2) Select first FireRescueService → cascades to district + fireStation
+      const frs = rootState.stateGlobalData.fireRescueServices[0];
+      if (frs) {
+        await dispatch(
+          "actionChangeSelectedFireRescueServiceId",
+          { fireRescueServiceId: frs.id },
+          { root: true }
+        );
+      }
 
-  return data;
-},
+      // 3) Load month-dependent data (planners + vacationActuals)
+      await dispatch(
+        "actionChangeSelectedMonth",
+        { month: rootState.stateGlobalSelected.month },
+        { root: true }
+      );
+
+      return data;
+    },
 
     restoreAuth({ commit }) {
       commit("RESTORE_AUTH");
@@ -121,15 +129,24 @@ async login({ commit, dispatch, state, rootState }, { email, password }) {
       commit("LOGOUT");
     },
 
-    async loadAllGlobalData({ dispatch }) {
-      console.log("auth/loadAllGlobalData: starting full data load");
-
+    // Optional helper if you want to trigger full reload from elsewhere
+    async loadAllGlobalData({ dispatch, rootState }) {
       await dispatch("actionLoadGlobalData", null, { root: true });
-      await dispatch("actionLoadGlobalDataForSelected", null, { root: true });
-      await dispatch("actionLoadGlobalDataForSelectedMonthPlanners", null, {root: true, });
-      await dispatch("actionLoadVacationCountsForSelectedYear", null, {root: true,});
 
-      console.log("auth/loadAllGlobalData: finished");
+      const frs = rootState.stateGlobalData.fireRescueServices[0];
+      if (frs) {
+        await dispatch(
+          "actionChangeSelectedFireRescueServiceId",
+          { fireRescueServiceId: frs.id },
+          { root: true }
+        );
+      }
+
+      await dispatch(
+        "actionChangeSelectedMonth",
+        { month: rootState.stateGlobalSelected.month },
+        { root: true }
+      );
     },
   },
 
