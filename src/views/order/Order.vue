@@ -172,12 +172,6 @@ export default {
     pickerDate: new Date().toISOString().substr(0, 10),
   }),
 
-watch: {
-  selectedMonth(newMonth) {
-    this.$store.dispatch("actionChangeSelectedMonth", { month: newMonth }, { root: true });
-  }
-},
-
   methods: {
     nextDate: function () {
       var d = new Date(this.cDate);
