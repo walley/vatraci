@@ -528,6 +528,10 @@ export default {
     },
   },
   created: function () {
+    // If members are empty, trigger a data load
+    if (!this.$store.state.stateGlobalDataForSelected.members.length) {
+      this.$store.dispatch("auth/loadAllGlobalData").catch(() => {});
+    }
     console.debug(`Planner.vue/created(): 1.`);
   },
   mounted: function () {

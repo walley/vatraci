@@ -120,12 +120,8 @@ export default {
 
       await dispatch("actionLoadGlobalData", null, { root: true });
       await dispatch("actionLoadGlobalDataForSelected", null, { root: true });
-      await dispatch("actionLoadGlobalDataForSelectedMonthPlanners", null, {
-        root: true,
-      });
-      await dispatch("actionLoadVacationCountsForSelectedYear", null, {
-        root: true,
-      });
+      await dispatch("actionLoadGlobalDataForSelectedMonthPlanners", null, {root: true, });
+      await dispatch("actionLoadVacationCountsForSelectedYear", null, {root: true,});
 
       console.log("auth/loadAllGlobalData: finished");
     },
