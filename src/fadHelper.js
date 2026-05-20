@@ -6,10 +6,10 @@ const ERROR = true; // set to false to disable ERROR logging via console.error()
 
 const fadHelper = {
   gp: function gp(resource) {
-    return api.url + "/" + api.path.prefix + "/" + `crud/fad/${resource}`;
+    return api.api_url + "/" + api.path.prefix + "/" + `crud/fad/${resource}`;
   },
   url: function url() {
-    return api.url;
+    return api.api_url;
   },
   shiftDaysInMonth: function (date, shiftCode) {
     var dayCount = new Date(
