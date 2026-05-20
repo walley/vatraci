@@ -34,6 +34,12 @@ const routes = [
     name: "About",
     component: () => import("../views/About.vue"),
   },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: () => import("@/views/Logout.vue"),
+    meta: { requiresAuth: false }
+  },
 ];
 
 const router = new VueRouter({
