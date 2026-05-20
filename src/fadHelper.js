@@ -1,4 +1,4 @@
-import api from "@/config/api";
+import config from "@/config/config";
 
 const DEBUG = true;
 // set to false to disable debugging
@@ -6,10 +6,10 @@ const ERROR = true; // set to false to disable ERROR logging via console.error()
 
 const fadHelper = {
   gp: function gp(resource) {
-    return api.api_url + "/" + api.path.prefix + "/" + `crud/fad/${resource}`;
+    return config.api_url + "/" + config.path.prefix + "/" + `crud/fad/${resource}`;
   },
   url: function url() {
-    return api.api_url;
+    return config.api_url;
   },
   shiftDaysInMonth: function (date, shiftCode) {
     var dayCount = new Date(
