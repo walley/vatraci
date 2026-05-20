@@ -136,11 +136,7 @@ export default {
   }),
   computed: {
     cUserId: function () {
-      if (localStorage.userId) {
-        return localStorage.userId;
-      } else {
-        return 1;
-      }
+      return this.$store.getters["auth/id"];
     },
     cReadOnly: function () {
       /*var permissions = JSON.parse(this.$store.state.auth.permissions)

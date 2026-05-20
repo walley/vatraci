@@ -1,12 +1,14 @@
 import config from "@/config/config";
 
-const DEBUG = true;
-// set to false to disable debugging
+const DEBUG = true; // set to false to disable debugging
 const ERROR = true; // set to false to disable ERROR logging via console.error()
 
 const fadHelper = {
   gp: function gp(resource) {
-    return config.api_url + "/" + config.path.prefix + "/" + `crud/fad/${resource}`;
+    var gpret = config.api_url + "/" + config.path.prefix + "/" + `crud/fad/${resource}`;
+    console.log("gpret ", gpret);
+    //return config.api_url + "/" + config.path.prefix + "/" + `crud/fad/${resource}`;
+    return gpret;
   },
   url: function url() {
     return config.api_url;
