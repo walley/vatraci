@@ -1,5 +1,5 @@
 import Vue from "vue";
-import apiConfig from "@/config/api";
+import apiConfig from "@/config/config";
 
 export default {
   namespaced: true,
