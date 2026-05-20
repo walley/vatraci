@@ -56,6 +56,7 @@ export default {
     async logout() {
       if (confirm("Opravdu chcete odhlásit?")) {
         await this.$store.dispatch("auth/logout");
+        this.$router.push("/logout");
       }
     }
   },
