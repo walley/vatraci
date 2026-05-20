@@ -7,7 +7,7 @@ export default {
     login: `${API_BASE}/auth/login`,
   },
 
-  url: "https://fada.hasici-ol.cz/fad-be/v1",
+  api_url: "https://fada.hasici-ol.cz/fad-be/v1",
   frontendBaseUrl: 'https://fadc.hasici-ol.cz/fad-fe/v3/',
 
   path: {
