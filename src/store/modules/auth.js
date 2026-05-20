@@ -1,5 +1,5 @@
 import Vue from "vue";
-import apiConfig from "@/config/config";
+import apiConfig from "@/config/api";
 
 export default {
   namespaced: true,
@@ -18,18 +18,50 @@ export default {
   mutations: {
     SET_AUTH_DATA(state, data) {
       state.token = data.token;
-      state.user = data.user;
-      state.id = data.id;
+      state.user = data.user || null;
+      state.id = data.id || null;
       state.permissions = data.permissions || [];
       state.shiftCodes = data.shiftCodes || [];
       state.shiftIds = data.shiftIds || [];
       state.fireStationIds = data.fireStationIds || [];
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("id", data.id);
+      state.isRestored = true;
+
+      localStorage.setItem("token", state.token || "");
+      localStorage.setItem("user", JSON.stringify(state.user));
+      localStorage.setItem("id", state.id || "");
+      localStorage.setItem(
+        "authData",
+        JSON.stringify({
+          permissions: state.permissions,
+          shiftCodes: state.shiftCodes,
+          shiftIds: state.shiftIds,
+          fireStationIds: state.fireStationIds,
+        })
+      );
     },
 
     RESTORE_AUTH(state) {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const id = localStorage.getItem("id");
+      const savedAuth = localStorage.getItem("authData");
+
+      if (token) state.token = token;
+      if (user) state.user = user;
+      if (id) state.id = id;
+
+      if (savedAuth) {
+        try {
+          const parsed = JSON.parse(savedAuth);
+          state.permissions = parsed.permissions || [];
+          state.shiftCodes = parsed.shiftCodes || [];
+          state.shiftIds = parsed.shiftIds || [];
+          state.fireStationIds = parsed.fireStationIds || [];
+        } catch (e) {
+          console.warn("Failed to parse saved auth data");
+        }
+      }
+
       state.isRestored = true;
     },
 
@@ -41,9 +73,12 @@ export default {
       state.shiftCodes = [];
       state.shiftIds = [];
       state.fireStationIds = [];
+      state.isRestored = false;
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("id");
+      localStorage.removeItem("authData");
     },
   },
 
@@ -78,8 +113,8 @@ export default {
 
       // 3) Load month-dependent data (planners + vacationActuals)
       await dispatch(
-        "actionLoadGlobalDataForSelectedMonthPlanners",
-        null,
+        "actionChangeSelectedMonth",
+        { month: rootState.stateGlobalSelected.month },
         { root: true }
       );
 
@@ -97,6 +132,7 @@ export default {
     // Optional helper if you want to trigger full reload from elsewhere
     async loadAllGlobalData({ dispatch, rootState }) {
       await dispatch("actionLoadGlobalData", null, { root: true });
+
       const frs = rootState.stateGlobalData.fireRescueServices[0];
       if (frs) {
         await dispatch(
@@ -105,9 +141,10 @@ export default {
           { root: true }
         );
       }
+
       await dispatch(
-        "actionLoadGlobalDataForSelectedMonthPlanners",
-        null,
+        "actionChangeSelectedMonth",
+        { month: rootState.stateGlobalSelected.month },
         { root: true }
       );
     },
@@ -115,9 +152,13 @@ export default {
 
   getters: {
     isAuthenticated: (state) => !!state.token,
-    user: (state) => state.user,
     token: (state) => state.token,
+    user: (state) => state.user,
     id: (state) => state.id,
+    shiftIds: (state) => state.shiftIds,
+    shiftCodes: (state) => state.shiftCodes,
+    fireStationIds: (state) => state.fireStationIds,
     permissions: (state) => state.permissions,
+    isRestored: (state) => state.isRestored,
   },
 };
