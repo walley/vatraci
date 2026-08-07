@@ -55,6 +55,10 @@
     <div v-else>
       C:
       {{ cTotalCount - cMinCounts[0].minimalniStav[shiftCode].C - cActuals.C }}
+x
+    </div>
+    <div x-small>
+      dop {{ cFillingCountForSelectedDate }}
     </div>
   </div>
 </template>
