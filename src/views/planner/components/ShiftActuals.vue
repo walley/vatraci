@@ -49,13 +49,23 @@
     </div>
     <div x-small v-if="cDebug">
       C: {{ cTotalCount }} - {{ cMinCounts[0].minimalniStav[shiftCode].C }} -
-      {{ cActuals.C }} =
-      {{ cTotalCount - cMinCounts[0].minimalniStav[shiftCode].C - cActuals.C }}
+      {{ cActuals.C }} +
+      {{ cFillingCountForSelectedDate }} =
+      {{
+        cTotalCount -
+          cMinCounts[0].minimalniStav[shiftCode].C -
+          cActuals.C +
+          cFillingCountForSelectedDate
+      }}
     </div>
     <div v-else>
       C:
-      {{ cTotalCount - cMinCounts[0].minimalniStav[shiftCode].C - cActuals.C }}
-x
+      {{
+        cTotalCount -
+          cMinCounts[0].minimalniStav[shiftCode].C -
+          cActuals.C +
+          cFillingCountForSelectedDate
+      }}
     </div>
     <div x-small>
       dop {{ cFillingCountForSelectedDate }}
@@ -95,6 +105,11 @@ export default {
           },
         ];
     },
+    cFillingCountForSelectedDate: function() {                                                            
+      var planners = this.$store.state.stateGlobalDataForSelected.planners                            
+      var cnt = planners.filter((p) => (p.date == this.date) & (p.Position.name == 'Doplnění')).length    
+      return cnt                                                                                          
+    },                                                                                                    
     cGlobalSelectedFireStationSettings: function () {
       return this.$store.state.stateGlobalDataForSelected.fireStationSettings;
     },

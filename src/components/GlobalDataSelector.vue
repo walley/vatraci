@@ -7,33 +7,41 @@
           <v-row no-gutter>
             <!-- Month Selection -->
             <v-col>
-              <v-btn icon @click.stop="mPreviousMonth">
-                <v-icon>mdi-menu-left</v-icon>
-              </v-btn>
-              <v-btn icon @click.stop="mNextMonth">
-                <v-icon>mdi-menu-right</v-icon>
-              </v-btn>
-            </v-col>
-            <v-col>
-              <v-menu
-                v-model="menuSelectedMonth"
-                :close-on-content-click="false"
-              >
-                <template v-slot:activator="{ on }">
-                  <v-text-field
+              <div class="d-flex align-center">
+                <v-btn icon class="ml-4" @click.stop="mPreviousMonth">
+                  <v-icon size="52">mdi-menu-left</v-icon>
+                </v-btn>
+                <v-menu
+                  v-model="menuSelectedMonth"
+                  :close-on-content-click="false"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-text-field
+                      v-model="cGlobalSelectedMonth"
+                      label="Kalendařní měsíc"
+                      prepend-icon="mdi-calendar-edit"
+                      readonly
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    type="month"
                     v-model="cGlobalSelectedMonth"
-                    label="Kalendařní měsíc"
-                    prepend-icon="mdi-calendar-edit"
-                    readonly
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  type="month"
-                  v-model="cGlobalSelectedMonth"
-                  @input="menuSelectedMonth = false"
-                ></v-date-picker>
-              </v-menu>
+                    @input="menuSelectedMonth = false"
+                  ></v-date-picker>
+                  <v-btn
+                    icon
+                    small
+                    @click="menuSelectedMonth = false"
+                    style="position: absolute; top: 4px; right: 4px"
+                  >
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </v-menu>
+                <v-btn icon class="mr-4" @click.stop="mNextMonth">
+                  <v-icon size="52">mdi-menu-right</v-icon>
+                </v-btn>
+              </div>
             </v-col>
           </v-row>
         </v-expansion-panel-header>
@@ -236,3 +244,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+::v-deep .v-date-picker-title__year {
+  font-size: 24px !important;
+}
+</style>

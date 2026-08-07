@@ -47,7 +47,7 @@
           </v-form>
 
           <v-card-actions class="justify-center mt-6">
-            <small class="grey--text">FAD v3 • Hasiči Olomouc</small>
+            <small class="grey--text">FAD v4 • Hasiči Olomouc</small>
           </v-card-actions>
         </v-card>
       </v-col>

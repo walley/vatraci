@@ -38,6 +38,7 @@
         :items="cItems"
         :items-per-page="-1"
         :search="search"
+        :sort-by="['lastName']"
         mobile
         class="elevation-1"
         dense
@@ -64,10 +65,12 @@
             <v-btn
               elevation="1"
               plain
+              block
               x-small
               @click="goToOrder(header.text)"
               >{{ header.text }}</v-btn
             >
+            <div class="subtitle-2 text-center">{{ dayName(h.value) }}</div>
             <br />
           </div>
           <hr :key="h.value + 1000" />
@@ -99,31 +102,9 @@
             :key="h.value"
             @click="onCellClick($event, { date: h.value, item: item })"
             :style="{
-              backgroundColor: `${
-                item[h.value].Position.name == 'Dovolená'
-                  ? '#b6d5a9' // Zelena
-                  : item[h.value].Position.name == 'FDS'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'FDS svátek'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'Krev'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'Služební cesta'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'Kurz'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'Jiné'
-                  ? '#cde2f5'
-                  : item[h.value].Position.name == 'Nemoc'
-                  ? '#f3cdcc'
-                  : item[h.value].Position.name == 'OČR'
-                  ? '#f3cdcc'
-                  : item[h.value].Position.name == 'Převelení'
-                  ? '#fef2ca'
-                  : item[h.value].Position.name == 'LOP'
-                  ? '#fce4cc'
-                  : ''
-              }`,
+              backgroundColor: cellBackgroundColor(
+                item[h.value].Position.name
+              ),
             }"
           >
             <!--  :class="{
@@ -222,6 +203,41 @@ export default {
     },
     onRowClick: function (row, detail) {
       alert(`click ${detail.index}`);
+    },
+    dayName: function (date) {
+      return new Date(date).toLocaleDateString("cs-CZ", {
+        weekday: "long",
+      });
+    },
+    cellBackgroundColor: function (positionName) {
+      var lightColors = {
+        "Dovolená": "#b6d5a9",
+        "FDS": "#cde2f5",
+        "FDS svátek": "#cde2f5",
+        "Krev": "#cde2f5",
+        "Služební cesta": "#cde2f5",
+        "Kurz": "#cde2f5",
+        "Jiné": "#cde2f5",
+        "Nemoc": "#f3cdcc",
+        "OČR": "#f3cdcc",
+        "Převelení": "#fef2ca",
+        "LOP": "#fce4cc",
+      };
+      var darkColors = {
+        "Dovolená": "#27452a",
+        "FDS": "#23374f",
+        "FDS svátek": "#23374f",
+        "Krev": "#23374f",
+        "Služební cesta": "#23374f",
+        "Kurz": "#23374f",
+        "Jiné": "#23374f",
+        "Nemoc": "#452222",
+        "OČR": "#452222",
+        "Převelení": "#453c18",
+        "LOP": "#452811",
+      };
+      var colors = this.$vuetify.theme.dark ? darkColors : lightColors;
+      return colors[positionName] || "";
     },
     onCellClick: function (e, payload) {
       //console.dir(e);
@@ -428,7 +444,7 @@ export default {
       var daysx = this.cDaysInMonth;
       var headers = [
         { text: "Příslušník", value: "lastName", divider: true },
-        { text: "Dov.", value: "vacation" },
+        { text: "Dov.(n/c)", value: "vacation" },
       ];
       for (let i = 0; i < daysx.length; i++) {
         let dString = daysx[i];

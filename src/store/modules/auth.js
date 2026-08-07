@@ -1,6 +1,13 @@
 import Vue from "vue";
 import apiConfig from "@/config/config";
 
+// Čistě frontendový administrátorský uživatel (bez backendového účtu)
+const FRONTEND_ADMIN = {
+  username: "admin",
+  password: "admin1234x",
+  permissions: ["ADMIN", "FAD", "FAD-PERMISSIONS", "FADFIREFIGHTER"],
+};
+
 export default {
   namespaced: true,
 
@@ -13,6 +20,7 @@ export default {
     shiftIds: [],
     fireStationIds: [],
     isRestored: false,
+    isFrontendAdmin: localStorage.getItem("isFrontendAdmin") === "true",
   },
 
   mutations: {
@@ -25,10 +33,12 @@ export default {
       state.shiftIds = data.shiftIds || [];
       state.fireStationIds = data.fireStationIds || [];
       state.isRestored = true;
+      state.isFrontendAdmin = !!data.isFrontendAdmin;
 
       localStorage.setItem("token", state.token || "");
       localStorage.setItem("user", JSON.stringify(state.user));
       localStorage.setItem("id", state.id || "");
+      localStorage.setItem("isFrontendAdmin", state.isFrontendAdmin ? "true" : "false");
       localStorage.setItem(
         "authData",
         JSON.stringify({
@@ -49,6 +59,7 @@ export default {
       if (token) state.token = token;
       if (user) state.user = user;
       if (id) state.id = id;
+      state.isFrontendAdmin = localStorage.getItem("isFrontendAdmin") === "true";
 
       if (savedAuth) {
         try {
@@ -74,16 +85,29 @@ export default {
       state.shiftIds = [];
       state.fireStationIds = [];
       state.isRestored = false;
+      state.isFrontendAdmin = false;
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("id");
       localStorage.removeItem("authData");
+      localStorage.removeItem("isFrontendAdmin");
     },
   },
 
   actions: {
     async login({ commit, dispatch, state, rootState }, { email, password }) {
+      if (email === FRONTEND_ADMIN.username && password === FRONTEND_ADMIN.password) {
+        commit("SET_AUTH_DATA", {
+          token: "frontend-admin-token",
+          user: { name: "Admin (frontend)", email: FRONTEND_ADMIN.username, active: true },
+          id: 0,
+          permissions: FRONTEND_ADMIN.permissions,
+          isFrontendAdmin: true,
+        });
+        return { isFrontendAdmin: true };
+      }
+
       const response = await Vue.http.post(apiConfig.auth.login, {
         email,
         password,
@@ -131,6 +155,8 @@ export default {
 
     // Optional helper if you want to trigger full reload from elsewhere
     async loadAllGlobalData({ dispatch, rootState }) {
+      if (rootState.auth.isFrontendAdmin) return;
+
       await dispatch("actionLoadGlobalData", null, { root: true });
 
       const frs = rootState.stateGlobalData.fireRescueServices[0];

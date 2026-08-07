@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="order-page">
     <!-- ORDER -->
     <!-- ORDER has many CREWS-->
     <!-- CREW has many POSITIONS -->
@@ -44,6 +44,11 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
+    </v-row>
+    <v-row>
+      <v-btn block x-large color="primary" @click="onPrint">
+        <v-icon left>mdi-printer</v-icon>Tisk
+      </v-btn>
     </v-row>
     <v-row>
       <v-col>
@@ -100,7 +105,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="12" md="4">
               <order-notes
                 :shift="cShift"
                 :fireStationId="
@@ -108,6 +113,8 @@
                 "
                 :date="cDate"
               ></order-notes>
+            </v-col>
+            <v-col cols="12" md="4">
               <order-member-filling
                 :shift="cShift"
                 :fireStationId="
@@ -115,6 +122,8 @@
                 "
                 :date="cDate"
               ></order-member-filling>
+            </v-col>
+            <v-col cols="12" md="4">
               <order-unavailability
                 :date="cDate"
                 :fireStationId="
@@ -135,7 +144,9 @@
           </v-row>
 	  -->
           <v-row>
-            <v-btn @click="onPrint">Tisk</v-btn>
+            <v-btn block x-large color="primary" @click="onPrint">
+              <v-icon left>mdi-printer</v-icon>Tisk
+            </v-btn>
           </v-row>
         </div>
       </template>

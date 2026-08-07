@@ -12,7 +12,11 @@ Vue.config.productionTip = false;
 Vue.use(VueLoading);
 
 // 1) Global vue-resource interceptor (always active)
+let pendingRequests = 0;
 Vue.http.interceptors.push((request, next) => {
+  pendingRequests += 1;
+  store.state.loading = true;
+
   const token = store.state.auth?.token || localStorage.getItem("token");
 
   if (token) {
@@ -23,8 +27,13 @@ Vue.http.interceptors.push((request, next) => {
   request.headers.set("X-Client-Version", "v3");
 
   next((response) => {
+    pendingRequests = Math.max(0, pendingRequests - 1);
+    if (pendingRequests === 0) store.state.loading = false;
     if (response.status === 401 || response.status === 403) {
-      if (router.currentRoute.path !== "/login") {
+      if (
+        router.currentRoute.path !== "/login" &&
+        !store.state.auth.isFrontendAdmin
+      ) {
         store.dispatch("auth/logout");
         router
           .push({

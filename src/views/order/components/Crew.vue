@@ -1,7 +1,7 @@
 <template>
   <!-- div>Test value: {{ value }} Test value WC: {{ fad.wcValue }}</div -->
   <v-col>
-    <v-card min-width="300" hover>
+    <v-card class="crew-card" min-width="300" hover>
       <v-card-subtitle>{{ crew.name }}</v-card-subtitle>
       <v-divider></v-divider>
       <v-skeleton-loader v-if="0 != 0">
